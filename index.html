@@ -9,12 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #000000; --bg: #FFFFFF; --card-bg: #F8F8F8; --text-main: #000000; --text-sub: #8E8E93; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding-bottom: env(safe-area-inset-bottom); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding-bottom: env(safe-area-inset-bottom); overflow-x: hidden; }
 
         /* サイドナビ */
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 75px; border-right: 1px solid #E5E5E5; display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: white; z-index: 1000; }
-        .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; }
+        .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; width: 100%; }
         .nav-icon.active { color: var(--primary); }
         .nav-icon span { font-size: 24px; display: block; }
         .nav-label { font-size: 10px; font-weight: 700; margin-top: 5px; }
@@ -24,32 +24,32 @@
 
         /* Habit List */
         .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 35px; }
-        input { border: 1px solid #E5E5E5; border-radius: 8px; padding: 14px; font-size: 16px; background: white; }
-        .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 800; font-size: 14px; }
+        input { border: 1px solid #E5E5E5; border-radius: 8px; padding: 14px; font-size: 16px; background: white; width: 100%; outline: none; }
+        .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 800; font-size: 14px; cursor: pointer; }
 
         .habit-card { border: 1px solid #E5E5E5; border-radius: 12px; padding: 18px; margin-bottom: 12px; display: flex; align-items: center; background: white; }
         .check-box { width: 22px; height: 22px; border: 2px solid #D1D1D6; border-radius: 6px; margin-right: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
         .check-box.done { background: var(--primary); border-color: var(--primary); color: white; }
-        .habit-info { flex: 1; cursor: pointer; }
-        .habit-name { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+        .habit-info { flex: 1; cursor: pointer; overflow: hidden; }
+        .habit-name { font-weight: 700; font-size: 16px; margin-bottom: 2px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 
-        /* Insights (Progress) */
+        /* Insights */
         .progress-circle-box { position: relative; width: 220px; height: 220px; margin: 40px auto; }
-        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
         .percent-num { font-size: 42px; font-weight: 800; display: block; }
         .percent-sub { font-size: 12px; font-weight: 600; color: var(--text-sub); }
 
-        /* Detail (Calendar UI) */
+        /* Detail/Calendar */
         .detail-top { display: flex; align-items: center; margin-bottom: 25px; }
         .tab-bar { display: flex; border-bottom: 1px solid #E5E5E5; margin-bottom: 25px; }
         .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 11px; font-weight: 800; color: #BBB; cursor: pointer; letter-spacing: 0.5px; }
         .tab.active { color: var(--primary); background: #F2F2F7; border-radius: 8px 8px 0 0; }
 
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
         .day-label { font-size: 11px; font-weight: 600; color: var(--text-sub); margin-bottom: 10px; }
-        .day-cell { height: 35px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; }
-        .day-cell.done::after { content: ''; position: absolute; width: 30px; height: 30px; background: var(--primary); border-radius: 50%; z-index: -1; }
+        .day-cell { height: 35px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; cursor: pointer; }
+        .day-cell.done::after { content: ''; position: absolute; width: 28px; height: 28px; background: var(--primary); border-radius: 50%; z-index: -1; }
         .day-cell.done { color: white; font-weight: 700; }
 
         .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -86,9 +86,207 @@
                 <span class="percent-sub" id="progressSubtext">0/0 Habits</span>
             </div>
         </div>
-        <div id="dailyProgressList"></div>
+        <div id="dailyProgressList" style="margin-top: 20px;"></div>
     </div>
 
     <div id="page-detail" hidden>
         <div class="detail-top">
-            <span onclick="app.showPage('habits')" style="cursor:pointer; font-size:24px;">‹</span>
+            <span onclick="app.showPage('habits')" style="cursor:pointer; font-size:28px; padding: 10px;">‹</span>
+            <h2 id="detailTitle" style="flex:1; text-align:center; margin:0; font-size: 18px;">Habit Detail</h2>
+            <div style="width: 48px;"></div>
+        </div>
+        <div class="tab-bar">
+            <div class="tab active" onclick="app.switchTab('cal', this)">CALENDAR</div>
+            <div class="tab" onclick="app.switchTab('graph', this)">GRAPH</div>
+            <div class="tab" onclick="app.switchTab('heat', this)">HEATMAP</div>
+        </div>
+        <div id="view-cal">
+            <div class="cal-header">
+                <span onclick="app.changeMonth(-1)" style="padding: 10px; cursor: pointer;">‹</span>
+                <b id="calMonthText">Month Year</b>
+                <span onclick="app.changeMonth(1)" style="padding: 10px; cursor: pointer;">›</span>
+            </div>
+            <div class="cal-grid" id="calendarGrid"></div>
+        </div>
+        <div id="view-graph" hidden><canvas id="detailGraphChart"></canvas></div>
+        <div id="view-heat" hidden><div class="heatmap-grid" id="heatmapGrid"></div></div>
+    </div>
+</div>
+
+<script>
+class HabitApp {
+    constructor() {
+        this.habits = [];
+        this.currentMonth = new Date();
+        this.selectedHabit = null;
+        this.charts = { progress: null, detail: null };
+        this.init();
+    }
+
+    init() {
+        try {
+            const saved = localStorage.getItem('hf_v23_stable');
+            this.habits = saved ? JSON.parse(saved) : [];
+            this.renderHabitList();
+        } catch (e) {
+            console.error("Data load error:", e);
+            this.habits = [];
+        }
+    }
+
+    save() {
+        localStorage.setItem('hf_v23_stable', JSON.stringify(this.habits));
+        this.renderHabitList();
+    }
+
+    addHabit() {
+        const input = document.getElementById('habitInput');
+        const val = input.value.trim();
+        if (!val) return;
+        this.habits.push({ id: Date.now(), name: val, dates: [] });
+        input.value = '';
+        this.save();
+    }
+
+    showPage(pageId) {
+        document.querySelectorAll('.main-content > div').forEach(p => p.hidden = true);
+        const target = document.getElementById(`page-${pageId}`);
+        if (target) target.hidden = false;
+
+        document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
+        const navItem = document.getElementById(`nav-${pageId === 'detail' ? 'habits' : pageId}`);
+        if (navItem) navItem.classList.add('active');
+
+        if(pageId === 'insights') this.renderProgress();
+    }
+
+    renderHabitList() {
+        const list = document.getElementById('habitList');
+        if (!list) return;
+        const today = new Date().toLocaleDateString('sv-SE');
+        list.innerHTML = '';
+        this.habits.forEach(h => {
+            const done = h.dates.includes(today);
+            list.innerHTML += `
+                <div class="habit-card">
+                    <div class="check-box ${done ? 'done' : ''}" onclick="app.toggleToday(${h.id})">${done ? '✓' : ''}</div>
+                    <div class="habit-info" onclick="app.openDetail(${h.id})">
+                        <div class="habit-name">${h.name}</div>
+                        <div style="font-size:12px; color:#8E8E93;">${h.dates.length} Days Total</div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    toggleToday(id) {
+        const habit = this.habits.find(h => h.id === id);
+        if (!habit) return;
+        const today = new Date().toLocaleDateString('sv-SE');
+        const idx = habit.dates.indexOf(today);
+        if (idx > -1) habit.dates.splice(idx, 1);
+        else habit.dates.push(today);
+        this.save();
+    }
+
+    renderProgress() {
+        const today = new Date().toLocaleDateString('sv-SE');
+        const done = this.habits.filter(h => h.dates.includes(today)).length;
+        const total = this.habits.length || 1;
+        const percent = Math.round((done / total) * 100);
+
+        document.getElementById('percentText').innerText = `${percent}%`;
+        document.getElementById('progressSubtext').innerText = `${done}/${this.habits.length} Habits Completed`;
+
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        if (this.charts.progress) this.charts.progress.destroy();
+        this.charts.progress = new Chart(ctx, {
+            type: 'doughnut',
+            data: { datasets: [{ data: [done, this.habits.length - done || 1], backgroundColor: ['#000', '#F2F2F7'], borderWidth: 0 }] },
+            options: { cutout: '88%', plugins: { tooltip: { enabled: false } }, responsive: true }
+        });
+
+        const list = document.getElementById('dailyProgressList');
+        list.innerHTML = '';
+        this.habits.forEach(h => {
+            const isDone = h.dates.includes(today);
+            list.innerHTML += `<div style="margin-bottom:10px; font-size:14px;"><b>${h.name}</b>: ${isDone?'1/1 Done':'0/1'}</div>`;
+        });
+    }
+
+    openDetail(id) {
+        this.selectedHabit = this.habits.find(h => h.id === id);
+        if (!this.selectedHabit) return;
+        document.getElementById('detailTitle').innerText = this.selectedHabit.name;
+        this.showPage('detail');
+        this.renderCalendar();
+    }
+
+    switchTab(type, el) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        ['cal', 'graph', 'heat'].forEach(v => {
+            const view = document.getElementById(`view-${v}`);
+            if (view) view.hidden = true;
+        });
+        const targetView = document.getElementById(`view-${type}`);
+        if (targetView) targetView.hidden = false;
+        
+        if(type === 'graph') this.renderGraph();
+        if(type === 'heat') this.renderHeatmap();
+    }
+
+    renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const monthTxt = document.getElementById('calMonthText');
+        if (!grid || !monthTxt) return;
+        grid.innerHTML = '';
+        
+        const year = this.currentMonth.getFullYear();
+        const month = this.currentMonth.getMonth();
+        monthTxt.innerText = this.currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => grid.innerHTML += `<div class="day-label">${d}</div>`);
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div></div>';
+        for (let d = 1; d <= lastDate; d++) {
+            const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const isDone = this.selectedHabit.dates.includes(dateStr);
+            grid.innerHTML += `<div class="day-cell ${isDone ? 'done' : ''}">${d}</div>`;
+        }
+    }
+
+    changeMonth(diff) {
+        this.currentMonth.setMonth(this.currentMonth.getMonth() + diff);
+        this.renderCalendar();
+    }
+
+    renderGraph() {
+        const ctx = document.getElementById('detailGraphChart').getContext('2d');
+        if (this.charts.detail) this.charts.detail.destroy();
+        const labels = Array.from({length: 14}, (_, i) => i + 1);
+        const data = labels.map(() => Math.random() > 0.5 ? 1 : 0);
+        this.charts.detail = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [{ data, borderColor: '#000', tension: 0.3, pointRadius: 0 }] },
+            options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+        });
+    }
+
+    renderHeatmap() {
+        const hm = document.getElementById('heatmapGrid');
+        if (!hm) return;
+        hm.innerHTML = '';
+        for(let i=0; i<70; i++) {
+            const active = Math.random() > 0.7;
+            hm.innerHTML += `<div class="heat-cell ${active ? 'on' : ''}"></div>`;
+        }
+    }
+}
+
+const app = new HabitApp();
+</script>
+</body>
+</html>
