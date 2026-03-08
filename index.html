@@ -8,56 +8,53 @@
     <title>HabitFlow</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #000000; --bg: #FFFFFF; --card-bg: #F8F8F8; --text-main: #1A1A1A; --text-sub: #666666; --accent: #000000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: "Helvetica Neue", Arial, sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding-bottom: env(safe-area-inset-bottom); }
+        :root { --primary: #000000; --bg: #FFFFFF; --card-bg: #F8F8F8; --text-main: #000000; --text-sub: #8E8E93; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding-bottom: env(safe-area-inset-bottom); }
 
-        /* ナビゲーション */
-        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 70px; border-right: 1px solid #EEE; display: flex; flex-direction: column; align-items: center; padding-top: 40px; background: white; z-index: 1000; }
-        .nav-icon { margin-bottom: 30px; cursor: pointer; text-align: center; opacity: 0.3; transition: 0.3s; }
-        .nav-icon.active { opacity: 1; }
-        .nav-label { font-size: 10px; font-weight: bold; margin-top: 4px; display: block; }
+        /* サイドナビ */
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 75px; border-right: 1px solid #E5E5E5; display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: white; z-index: 1000; }
+        .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; }
+        .nav-icon.active { color: var(--primary); }
+        .nav-icon span { font-size: 24px; display: block; }
+        .nav-label { font-size: 10px; font-weight: 700; margin-top: 5px; }
 
-        .main-content { margin-left: 70px; padding: 40px 24px; min-height: 100vh; }
-        h1 { font-size: 28px; font-weight: 800; margin-bottom: 24px; letter-spacing: -0.5px; }
+        .main-content { margin-left: 75px; padding: 40px 25px; min-height: 100vh; }
+        h1 { font-size: 26px; font-weight: 800; margin: 0 0 30px 0; }
 
-        /* 入力エリア */
-        .input-section { margin-bottom: 40px; }
-        .input-group { display: flex; gap: 8px; margin-top: 8px; }
-        input { flex: 1; border: 1.5px solid #EEE; border-radius: 8px; padding: 12px; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 0 16px; font-weight: bold; }
+        /* Habit List */
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 35px; }
+        input { border: 1px solid #E5E5E5; border-radius: 8px; padding: 14px; font-size: 16px; background: white; }
+        .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 800; font-size: 14px; }
 
-        /* リスト表示 */
-        .habit-card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 12px; display: flex; align-items: center; transition: 0.2s; }
-        .habit-card:active { transform: scale(0.98); }
-        .check-box { width: 24px; height: 24px; border: 2px solid #DDD; border-radius: 6px; margin-right: 16px; display: flex; align-items: center; justify-content: center; background: white; flex-shrink: 0; }
+        .habit-card { border: 1px solid #E5E5E5; border-radius: 12px; padding: 18px; margin-bottom: 12px; display: flex; align-items: center; background: white; }
+        .check-box { width: 22px; height: 22px; border: 2px solid #D1D1D6; border-radius: 6px; margin-right: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
         .check-box.done { background: var(--primary); border-color: var(--primary); color: white; }
         .habit-info { flex: 1; cursor: pointer; }
-        .habit-name { font-weight: bold; font-size: 16px; }
-        .streak-info { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+        .habit-name { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
 
-        /* 進捗ページ (Progress) */
-        #progress-container { text-align: center; }
-        .chart-box { position: relative; width: 220px; margin: 40px auto; }
-        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: 800; }
-        .progress-list { text-align: left; margin-top: 40px; }
-        .p-item { margin-bottom: 15px; }
-        .p-bar-bg { background: #EEE; height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden; }
-        .p-bar-fill { background: var(--primary); height: 100%; transition: width 0.5s ease; }
+        /* Insights (Progress) */
+        .progress-circle-box { position: relative; width: 220px; height: 220px; margin: 40px auto; }
+        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .percent-num { font-size: 42px; font-weight: 800; display: block; }
+        .percent-sub { font-size: 12px; font-weight: 600; color: var(--text-sub); }
 
-        /* 詳細分析ページ */
-        .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .back-btn { font-size: 24px; cursor: pointer; }
-        .tab-menu { display: flex; gap: 15px; border-bottom: 1px solid #EEE; margin-bottom: 20px; }
-        .tab-btn { padding: 8px 0; font-size: 12px; font-weight: bold; color: var(--text-sub); border-bottom: 2px solid transparent; cursor: pointer; text-transform: uppercase; }
-        .tab-btn.active { color: var(--text-main); border-bottom-color: var(--primary); }
+        /* Detail (Calendar UI) */
+        .detail-top { display: flex; align-items: center; margin-bottom: 25px; }
+        .tab-bar { display: flex; border-bottom: 1px solid #E5E5E5; margin-bottom: 25px; }
+        .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 11px; font-weight: 800; color: #BBB; cursor: pointer; letter-spacing: 0.5px; }
+        .tab.active { color: var(--primary); background: #F2F2F7; border-radius: 8px 8px 0 0; }
 
-        .viz-box { display: none; }
-        .viz-box.active { display: block; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+        .day-label { font-size: 11px; font-weight: 600; color: var(--text-sub); margin-bottom: 10px; }
+        .day-cell { height: 35px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; }
+        .day-cell.done::after { content: ''; position: absolute; width: 30px; height: 30px; background: var(--primary); border-radius: 50%; z-index: -1; }
+        .day-cell.done { color: white; font-weight: 700; }
+
         .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .heat-cell { aspect-ratio: 1; border-radius: 2px; background: #EEE; }
-        .heat-on { background: #333; }
+        .heat-cell { aspect-ratio: 1; border-radius: 2px; background: #E5E5E5; }
+        .heat-cell.on { background: #333; }
 
         [hidden] { display: none !important; }
     </style>
@@ -65,197 +62,33 @@
 <body>
 
 <div class="sidebar">
-    <div class="nav-icon active" onclick="app.showPage('habits', this)">📋<span class="nav-label">Habits</span></div>
-    <div class="nav-icon" onclick="app.showPage('insights', this)">📈<span class="nav-label">Insights</span></div>
-    <div class="nav-icon" onclick="app.showPage('goal', this)">🎯<span class="nav-label">Goal</span></div>
+    <div class="nav-icon active" id="nav-habits" onclick="app.showPage('habits')"><span>⊞</span><div class="nav-label">Habits</div></div>
+    <div class="nav-icon" id="nav-insights" onclick="app.showPage('insights')"><span>📊</span><div class="nav-label">Insights</div></div>
 </div>
 
 <div class="main-content">
     <div id="page-habits">
-        <h1>Habits</h1>
-        <div class="input-section">
-            <label style="font-size: 14px; font-weight: bold;">Input new habits</label>
-            <div class="input-group">
-                <input type="text" id="habitInput" placeholder="Input name">
-                <button class="add-btn" onclick="app.addHabit()">+ Add Habit</button>
-            </div>
+        <h1>HabitFlow</h1>
+        <div class="input-group">
+            <span style="font-size: 14px; font-weight: 800;">Input new habits</span>
+            <input type="text" id="habitInput" placeholder="Morning Meditation">
+            <button class="add-btn" onclick="app.addHabit()">+ Add Habit</button>
         </div>
         <div id="habitList"></div>
     </div>
 
     <div id="page-insights" hidden>
         <h1>Today's Progress</h1>
-        <div id="progress-container">
-            <div class="chart-box">
-                <canvas id="mainProgressChart"></canvas>
-                <div class="percentage" id="percentText">0%</div>
+        <div class="progress-circle-box">
+            <canvas id="progressChart"></canvas>
+            <div class="percentage">
+                <span class="percent-num" id="percentText">0%</span>
+                <span class="percent-sub" id="progressSubtext">0/0 Habits</span>
             </div>
-            <div id="dailyProgressList" class="progress-list"></div>
         </div>
+        <div id="dailyProgressList"></div>
     </div>
 
     <div id="page-detail" hidden>
-        <div class="detail-header">
-            <span class="back-btn" onclick="app.showPage('habits')">←</span>
-            <h2 id="detailTitle" style="margin: 0;">Habit Detail</h2>
-            <div style="width: 24px;"></div>
-        </div>
-        <div class="tab-menu">
-            <div class="tab-btn active" onclick="app.switchDetailTab('calendar', this)">Calendar</div>
-            <div class="tab-btn" onclick="app.switchDetailTab('graph', this)">Graph</div>
-            <div class="tab-btn" onclick="app.switchDetailTab('heatmap', this)">Heatmap</div>
-        </div>
-        <div id="viz-calendar" class="viz-box active"></div>
-        <div id="viz-graph" class="viz-box"><canvas id="detailGraph"></canvas></div>
-        <div id="viz-heatmap" class="viz-box"><div class="heatmap-grid" id="detailHeatmap"></div></div>
-    </div>
-</div>
-
-<script>
-class HabitFlow {
-    constructor() {
-        this.habits = JSON.parse(localStorage.getItem('hf_data')) || [];
-        this.selectedHabitId = null;
-        this.charts = { main: null, detail: null };
-        this.init();
-    }
-
-    init() { this.renderHabitList(); }
-
-    save() {
-        localStorage.setItem('hf_data', JSON.stringify(this.habits));
-        this.renderHabitList();
-        if (this.selectedHabitId) this.renderDetail(this.selectedHabitId);
-    }
-
-    addHabit() {
-        const input = document.getElementById('habitInput');
-        if (!input.value) return;
-        this.habits.push({ id: Date.now(), name: input.value, dates: [] });
-        input.value = '';
-        this.save();
-    }
-
-    toggleCheck(id, e) {
-        e.stopPropagation();
-        const habit = this.habits.find(h => h.id === id);
-        const today = new Date().toLocaleDateString('sv-SE');
-        const idx = habit.dates.indexOf(today);
-        if (idx > -1) habit.dates.splice(idx, 1);
-        else habit.dates.push(today);
-        this.save();
-    }
-
-    showPage(pageId, el) {
-        document.querySelectorAll('.main-content > div').forEach(p => p.hidden = true);
-        document.getElementById(`page-${pageId}`).hidden = false;
-        if (el) {
-            document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-        }
-        if (pageId === 'insights') this.renderOverallProgress();
-    }
-
-    renderHabitList() {
-        const list = document.getElementById('habitList');
-        const today = new Date().toLocaleDateString('sv-SE');
-        list.innerHTML = '';
-        this.habits.forEach(h => {
-            const isDone = h.dates.includes(today);
-            list.innerHTML += `
-                <div class="habit-card">
-                    <div class="check-box ${isDone ? 'done' : ''}" onclick="app.toggleCheck(${h.id}, event)">${isDone ? '✓' : ''}</div>
-                    <div class="habit-info" onclick="app.openDetail(${h.id})">
-                        <div class="habit-name">${h.name}</div>
-                        <div class="streak-info">${h.dates.length} Days Total</div>
-                    </div>
-                </div>`;
-        });
-    }
-
-    renderOverallProgress() {
-        const today = new Date().toLocaleDateString('sv-SE');
-        const doneCount = this.habits.filter(h => h.dates.includes(today)).length;
-        const total = this.habits.length || 1;
-        const percent = Math.round((doneCount / this.habits.length) * 100) || 0;
-
-        document.getElementById('percentText').innerText = `${percent}%`;
-        const ctx = document.getElementById('mainProgressChart').getContext('2d');
-        if (this.charts.main) this.charts.main.destroy();
-        this.charts.main = new Chart(ctx, {
-            type: 'doughnut',
-            data: { datasets: [{ data: [doneCount, this.habits.length - doneCount], backgroundColor: ['#000', '#EEE'], borderWidth: 0 }] },
-            options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
-        });
-
-        const list = document.getElementById('dailyProgressList');
-        list.innerHTML = '';
-        this.habits.forEach(h => {
-            const done = h.dates.includes(today);
-            list.innerHTML += `
-                <div class="p-item">
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold;">
-                        <span>${h.name}</span><span>${done ? '1/1 Done' : '0/1'}</span>
-                    </div>
-                    <div class="p-bar-bg"><div class="p-bar-fill" style="width:${done ? 100 : 0}%"></div></div>
-                </div>`;
-        });
-    }
-
-    openDetail(id) {
-        this.selectedHabitId = id;
-        this.showPage('detail');
-        this.renderDetail(id);
-    }
-
-    renderDetail(id) {
-        const habit = this.habits.find(h => h.id === id);
-        document.getElementById('detailTitle').innerText = habit.name;
-
-        // カレンダー簡易表示 (直近28日)
-        const cal = document.getElementById('viz-calendar');
-        cal.innerHTML = '<div class="heatmap-grid" id="calGrid"></div>';
-        const grid = document.getElementById('calGrid');
-        for(let i=27; i>=0; i--) {
-            const d = new Date(); d.setDate(d.getDate()-i);
-            const isDone = habit.dates.includes(d.toLocaleDateString('sv-SE'));
-            grid.innerHTML += `<div class="heat-cell ${isDone ? 'heat-on' : ''}"></div>`;
-        }
-
-        // ヒートマップ
-        const hm = document.getElementById('detailHeatmap');
-        hm.innerHTML = '';
-        for(let i=90; i>=0; i--) { // 90日間
-            const d = new Date(); d.setDate(d.getDate()-i);
-            const isDone = habit.dates.includes(d.toLocaleDateString('sv-SE'));
-            hm.innerHTML += `<div class="heat-cell ${isDone ? 'heat-on' : ''}"></div>`;
-        }
-
-        // グラフ
-        const ctx = document.getElementById('detailGraph').getContext('2d');
-        if (this.charts.detail) this.charts.detail.destroy();
-        const labels = []; const data = [];
-        for(let i=14; i>=0; i--) {
-            const d = new Date(); d.setDate(d.getDate()-i);
-            labels.push(d.getDate());
-            data.push(habit.dates.includes(d.toLocaleDateString('sv-SE')) ? 1 : 0);
-        }
-        this.charts.detail = new Chart(ctx, {
-            type: 'line',
-            data: { labels, datasets: [{ label: 'Completed', data, borderColor: '#000', tension: 0.3, fill: false }] },
-            options: { scales: { y: { display: false } }, plugins: { legend: { display: false } } }
-        });
-    }
-
-    switchDetailTab(type, el) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.viz-box').forEach(v => v.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById(`viz-${type}`).classList.add('active');
-    }
-}
-
-const app = new HabitFlow();
-</script>
-</body>
-</html>
+        <div class="detail-top">
+            <span onclick="app.showPage('habits')" style="cursor:pointer; font-size:24px;">‹</span>
