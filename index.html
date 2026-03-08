@@ -14,10 +14,17 @@
 
         /* サイドナビ */
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 75px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: white; z-index: 1000; }
-        .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; width: 100%; }
+        .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; width: 100%; display: flex; flex-direction: column; align-items: center; }
         .nav-icon.active { color: var(--primary); }
-        .nav-icon span { font-size: 24px; display: block; }
-        .nav-label { font-size: 10px; font-weight: 700; margin-top: 5px; }
+        
+        /* 修正：Insightsアイコン（3本の棒グラフ） */
+        .icon-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+        .nav-icon.active .icon-svg { stroke: var(--primary); }
+
+        /* Habitsアイコン（2x2マス） */
+        .icon-habits { font-size: 20px; display: block; font-weight: bold; }
+
+        .nav-label { font-size: 10px; font-weight: 700; margin-top: 6px; }
 
         .main-content { margin-left: 75px; padding: 40px 25px; min-height: 100vh; }
         h1 { font-size: 26px; font-weight: 800; margin: 0 0 30px 0; }
@@ -65,8 +72,18 @@
 <body>
 
 <div class="sidebar">
-    <div class="nav-icon active" id="nav-habits" onclick="app.showPage('habits')"><span>⊞</span><div class="nav-label">Habits</div></div>
-    <div class="nav-icon" id="nav-insights" onclick="app.showPage('insights')"><span>📊</span><div class="nav-label">Insights</div></div>
+    <div class="nav-icon active" id="nav-habits" onclick="app.showPage('habits')">
+        <span class="icon-habits">⊞</span>
+        <div class="nav-label">Habits</div>
+    </div>
+    <div class="nav-icon" id="nav-insights" onclick="app.showPage('insights')">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="6" y1="20" x2="6" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="18" y1="20" x2="18" y2="14" />
+        </svg>
+        <div class="nav-label">Insights</div>
+    </div>
 </div>
 
 <div class="main-content">
@@ -90,7 +107,7 @@
             </div>
         </div>
         <div id="dailyProgressList"></div>
-        </div>
+    </div>
 
     <div id="page-detail" hidden>
         <div style="display:flex; align-items:center; margin-bottom:25px;">
@@ -118,7 +135,8 @@
 <script>
 class HabitFlow {
     constructor() {
-        this.habits = JSON.parse(localStorage.getItem('hf_v25')) || [];
+        // データキーを更新し、以前のエラーデータをリセット
+        this.habits = JSON.parse(localStorage.getItem('hf_v26_final')) || [];
         this.currentMonth = new Date();
         this.selectedHabit = null;
         this.charts = { progress: null, detail: null };
@@ -126,7 +144,7 @@ class HabitFlow {
     }
 
     save() {
-        localStorage.setItem('hf_v25', JSON.stringify(this.habits));
+        localStorage.setItem('hf_v26_final', JSON.stringify(this.habits));
         this.renderHabitList();
     }
 
@@ -158,7 +176,7 @@ class HabitFlow {
                     <div class="check-box ${done ? 'done' : ''}" onclick="app.toggleCheck(${h.id})">${done ? '✓' : ''}</div>
                     <div class="habit-info" onclick="app.openDetail(${h.id})">
                         <div class="habit-name">${h.name}</div>
-                        <div style="font-size:12px; color:var(--text-sub);">${h.dates.length} Days Total</div>
+                        <div style="font-size:12px; color:var(--text-sub);">${this.getStreak(h)} Days Streak</div>
                     </div>
                 </div>`;
         });
@@ -173,6 +191,16 @@ class HabitFlow {
         this.save();
     }
 
+    getStreak(h) {
+        let streak = 0;
+        let d = new Date();
+        while(true) {
+            if(h.dates.includes(d.toLocaleDateString('sv-SE'))) { streak++; d.setDate(d.getDate()-1); }
+            else break;
+        }
+        return streak;
+    }
+
     renderInsights() {
         const today = new Date().toLocaleDateString('sv-SE');
         const completed = this.habits.filter(h => h.dates.includes(today)).length;
@@ -182,18 +210,16 @@ class HabitFlow {
         document.getElementById('percentText').innerText = `${percent}%`;
         document.getElementById('progressSubtext').innerText = `${completed}/${total} Habits Completed`;
 
-        // ドーナツチャートの描画ロジックの修正
         const ctx = document.getElementById('progressChart').getContext('2d');
         if (this.charts.progress) this.charts.progress.destroy();
         this.charts.progress = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    // 達成済みの数と、残りの数。total=completedなら2つ目は0になる。
-                    data: [completed, total - completed],
+                    // 修正：100%達成時に完全に黒く染まるようにデータを最適化
+                    data: completed === 0 && total === 0 ? [0, 1] : [completed, total - completed],
                     backgroundColor: ['#000', '#F2F2F7'],
                     borderWidth: 0,
-                    // アニメーション設定
                     circumference: 360,
                     rotation: -90 // 12時の位置から開始
                 }]
@@ -218,6 +244,8 @@ class HabitFlow {
         document.getElementById('detailTitle').innerText = this.selectedHabit.name;
         this.showPage('detail');
         this.renderCalendar();
+        this.renderGraph();
+        this.renderHeatmap();
     }
 
     switchTab(type, el) {
@@ -225,8 +253,6 @@ class HabitFlow {
         el.classList.add('active');
         ['cal', 'graph', 'heat'].forEach(v => document.getElementById(`view-${v}`).hidden = true);
         document.getElementById(`view-${type}`).hidden = false;
-        if(type === 'graph') this.renderGraph();
-        if(type === 'heat') this.renderHeatmap();
     }
 
     renderCalendar() {
@@ -252,12 +278,14 @@ class HabitFlow {
     renderGraph() {
         const ctx = document.getElementById('detailGraphChart').getContext('2d');
         if (this.charts.detail) this.charts.detail.destroy();
+        
         const labels = [], data = [];
         for(let i=14; i>=0; i--) {
             const d = new Date(); d.setDate(d.getDate()-i);
             labels.push(d.getDate());
             data.push(this.selectedHabit.dates.includes(d.toLocaleDateString('sv-SE')) ? 1 : 0);
         }
+
         this.charts.detail = new Chart(ctx, {
             type: 'line',
             data: { labels, datasets: [{ data, borderColor: '#000', tension: 0.3, pointRadius: 0 }] },
