@@ -12,6 +12,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background-color: var(--bg); color: var(--text-main); margin: 0; padding-bottom: env(safe-area-inset-bottom); overflow-x: hidden; }
 
+        /* Navigation */
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 75px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: white; z-index: 1000; }
         .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; width: 100%; display: flex; flex-direction: column; align-items: center; }
         .nav-icon.active { color: var(--primary); }
@@ -21,7 +22,7 @@
         .main-content { margin-left: 75px; padding: 40px 25px; min-height: 100vh; }
         h1 { font-size: 26px; font-weight: 800; margin: 0 0 20px 0; }
 
-        /* Reminder Settings Area */
+        /* Settings Area */
         .settings-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 30px; border: 1px solid var(--border); }
         .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .settings-label { font-size: 13px; font-weight: 700; }
@@ -31,7 +32,7 @@
         .toggle-switch::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: white; top: 2px; left: 2px; transition: 0.3s; }
         .toggle-switch:checked::after { left: 22px; }
 
-        /* Habit List UI */
+        /* List UI */
         .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
         input[type="text"] { border: 1.5px solid var(--border); border-radius: 8px; padding: 14px; font-size: 16px; width: 100%; outline: none; }
         .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 800; font-size: 14px; cursor: pointer; }
@@ -46,16 +47,16 @@
 
         /* Insights Page */
         .progress-circle-box { position: relative; width: 220px; height: 220px; margin: 10px auto 30px; }
-        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
         .percent-num { font-size: 48px; font-weight: 800; display: block; line-height: 1; }
-        .percent-sub { font-size: 12px; font-weight: 600; color: var(--text-sub); }
+        .percent-sub { font-size: 12px; font-weight: 600; color: var(--text-sub); display: block; margin-top: 5px; }
 
         .progress-item { margin-bottom: 20px; }
         .progress-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
         .progress-bar-bg { background: #EEE; height: 6px; border-radius: 3px; overflow: hidden; }
         .progress-bar-fill { background: var(--primary); height: 100%; transition: width 0.4s ease; }
 
-        /* Calendar / Detail */
+        /* Detail UI */
         .tab-bar { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 11px; font-weight: 800; color: #BBB; cursor: pointer; }
         .tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
@@ -86,18 +87,16 @@
 <div class="main-content">
     <div id="page-habits">
         <h1>HabitFlow</h1>
-        
         <div class="settings-card">
             <div class="settings-row">
                 <span class="settings-label">Reminder Notification</span>
                 <input type="checkbox" id="reminderToggle" class="toggle-switch" onchange="app.toggleReminder()">
             </div>
-            <div class="settings-row" id="timeSettingRow">
+            <div class="settings-row">
                 <span class="settings-label">Delivery Time</span>
                 <input type="time" id="reminderTime" class="time-input" onchange="app.updateReminderTime()">
             </div>
         </div>
-
         <div class="input-group">
             <input type="text" id="habitInput" placeholder="New habit name...">
             <button class="add-btn" onclick="app.addHabit()">+ Add Habit</button>
@@ -109,7 +108,10 @@
         <h1>Today's Progress</h1>
         <div class="progress-circle-box">
             <canvas id="progressChart"></canvas>
-            <div class="percentage"><span class="percent-num" id="percentText">0%</span><span class="percent-sub" id="progressSubtext">0/0 Habits</span></div>
+            <div class="percentage">
+                <span class="percent-num" id="percentText">0%</span>
+                <span class="percent-sub" id="progressSubtext">0/0 Completed</span>
+            </div>
         </div>
         <div id="dailyProgressList"></div>
     </div>
@@ -126,9 +128,9 @@
         </div>
         <div id="view-cal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <span onclick="app.changeMonth(-1)" style="cursor:pointer;">‹ Prev</span>
+                <span onclick="app.changeMonth(-1)" style="cursor:pointer;">‹</span>
                 <b id="calMonthText"></b>
-                <span onclick="app.changeMonth(1)" style="cursor:pointer;">Next ›</span>
+                <span onclick="app.changeMonth(1)" style="cursor:pointer;">›</span>
             </div>
             <div class="cal-grid" id="calendarGrid"></div>
         </div>
@@ -140,7 +142,7 @@
 <script>
 class HabitFlow {
     constructor() {
-        this.habits = JSON.parse(localStorage.getItem('hf_v28')) || [];
+        this.habits = JSON.parse(localStorage.getItem('hf_final')) || [];
         this.reminder = JSON.parse(localStorage.getItem('hf_reminder')) || { enabled: false, time: "23:00" };
         this.currentMonth = new Date();
         this.selectedHabit = null;
@@ -156,12 +158,11 @@ class HabitFlow {
     }
 
     save() {
-        localStorage.setItem('hf_v28', JSON.stringify(this.habits));
+        localStorage.setItem('hf_final', JSON.stringify(this.habits));
         localStorage.setItem('hf_reminder', JSON.stringify(this.reminder));
         this.renderHabitList();
     }
 
-    // 習慣の追加・編集・削除
     addHabit() {
         const input = document.getElementById('habitInput');
         if (!input.value.trim()) return;
@@ -177,13 +178,12 @@ class HabitFlow {
     }
 
     deleteHabit(id) {
-        if (confirm("Delete this habit and all history?")) {
+        if (confirm("Delete this habit?")) {
             this.habits = this.habits.filter(h => h.id !== id);
             this.save();
         }
     }
 
-    // リマインダー設定
     toggleReminder() {
         this.reminder.enabled = document.getElementById('reminderToggle').checked;
         if (this.reminder.enabled && Notification.permission !== "granted") {
@@ -205,12 +205,11 @@ class HabitFlow {
             const today = new Date().toLocaleDateString('sv-SE');
             const uncompleted = this.habits.filter(h => !h.dates.includes(today));
             if (uncompleted.length > 0) {
-                new Notification("HabitFlow", { body: `You have ${uncompleted.length} habits left for today!` });
+                new Notification("HabitFlow", { body: `あと${uncompleted.length}個の習慣が未完了です！` });
             }
         }
     }
 
-    // 描画関連
     renderHabitList() {
         const list = document.getElementById('habitList');
         const today = new Date().toLocaleDateString('sv-SE');
@@ -222,7 +221,7 @@ class HabitFlow {
                     <div class="check-box ${done ? 'done' : ''}" onclick="app.toggleCheck(${h.id})">${done ? '✓' : ''}</div>
                     <div class="habit-info" onclick="app.openDetail(${h.id})">
                         <div class="habit-name">${h.name}</div>
-                        <div style="font-size:11px; color:var(--text-sub);">Streak: ${this.getStreak(h)} days</div>
+                        <div style="font-size:11px; color:var(--text-sub);">${this.getStreak(h)} Days Streak</div>
                     </div>
                     <div class="edit-actions">
                         <button class="btn-icon" onclick="event.stopPropagation(); app.editHabit(${h.id})">✎</button>
@@ -239,6 +238,7 @@ class HabitFlow {
         if (idx > -1) h.dates.splice(idx, 1);
         else h.dates.push(today);
         this.save();
+        if (document.getElementById('page-insights').hidden === false) this.renderInsights();
     }
 
     getStreak(h) {
@@ -266,20 +266,29 @@ class HabitFlow {
 
         const ctx = document.getElementById('progressChart').getContext('2d');
         if (this.charts.progress) this.charts.progress.destroy();
+        
+        // 100%の時にグレーが出ないように厳密に計算
+        const chartData = (total === 0) ? [0, 1] : [completed, total - completed];
+
         this.charts.progress = new Chart(ctx, {
             type: 'doughnut',
-            data: { datasets: [{ data: [completed, total - completed || 1], backgroundColor: ['#000', '#F2F2F7'], borderWidth: 0 }] },
-            options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
+            data: {
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: ['#000', '#F2F2F7'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '85%', plugins: { tooltip: { enabled: false } }, animation: { duration: 400 } }
         });
 
-        // 達成状況リストの復元
         const list = document.getElementById('dailyProgressList');
         list.innerHTML = '';
         this.habits.forEach(h => {
             const isDone = h.dates.includes(today);
             list.innerHTML += `
                 <div class="progress-item">
-                    <div class="progress-header"><span>${h.name}</span><span>${isDone?'1/1':'0/1'} Done</span></div>
+                    <div class="progress-header"><span>${h.name}</span><span>${isDone?'1/1 Done':'0/1'}</span></div>
                     <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${isDone?100:0}%"></div></div>
                 </div>`;
         });
