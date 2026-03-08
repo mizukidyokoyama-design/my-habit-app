@@ -12,65 +12,97 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background-color: var(--bg); color: var(--text-main); margin: 0; padding-bottom: env(safe-area-inset-bottom); overflow-x: hidden; }
 
+        /* Navigation */
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 75px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: white; z-index: 1000; }
         .nav-icon { margin-bottom: 35px; cursor: pointer; text-align: center; color: #BBB; transition: 0.2s; width: 100%; display: flex; flex-direction: column; align-items: center; }
         .nav-icon.active { color: var(--primary); }
+        
+        /* 復元：Insightsアイコン（3本の棒グラフ） */
+        .icon-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+        .nav-icon.active .icon-svg { stroke: var(--primary); }
+
+        /* Habitsアイコン（2x2マス） */
+        .icon-habits { font-size: 20px; display: block; font-weight: bold; }
+
         .nav-label { font-size: 10px; font-weight: 700; margin-top: 6px; }
 
         .main-content { margin-left: 75px; padding: 40px 25px; min-height: 100vh; }
-        h1 { font-size: 26px; font-weight: 800; margin: 0 0 20px 0; }
+        h1 { font-size: 26px; font-weight: 800; margin: 0 0 30px 0; }
 
+        /* Habit List Page */
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+        input[type="text"] { border: 1.5px solid var(--border); border-radius: 8px; padding: 14px; font-size: 16px; width: 100%; outline: none; transition: border 0.2s; }
+        input[type="text"]:focus { border-color: var(--primary); }
+        .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 800; font-size: 14px; cursor: pointer; }
+        
+        .habit-card { border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 12px; display: flex; align-items: center; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .check-box { width: 24px; height: 24px; border: 2px solid #D1D1D6; border-radius: 6px; margin-right: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+        .check-box.done { background: var(--primary); border-color: var(--primary); color: white; }
+        .habit-info { flex: 1; cursor: pointer; overflow: hidden; }
+        .habit-name { font-weight: 700; font-size: 16px; margin-bottom: 2px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        
+        /* 編集アクション */
+        .edit-actions { display: flex; gap: 8px; margin-left: 10px; }
+        .btn-icon { background: none; border: none; font-size: 16px; cursor: pointer; color: #BBB; padding: 5px; transition: 0.2s; }
+        .btn-icon:hover { color: var(--primary); }
+        .btn-delete { color: #E5E5E5; }
+        .btn-delete:hover { color: var(--danger); }
+
+        /* Insights Page */
+        .progress-circle-box { position: relative; width: 240px; height: 240px; margin: 20px auto 40px; }
+        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
+        .percent-num { font-size: 52px; font-weight: 800; display: block; line-height: 1; }
+        .percent-sub { font-size: 13px; font-weight: 600; color: #000; margin-top: 8px; display: block; }
+
+        .progress-item { margin-bottom: 25px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .progress-bar-bg { background: #EEE; height: 6px; border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { background: var(--primary); height: 100%; transition: width 0.6s cubic-bezier(0.1, 0, 0, 1); }
+
+        /* Reminder Settings */
         .settings-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 30px; border: 1px solid var(--border); }
         .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .settings-label { font-size: 13px; font-weight: 700; }
         .time-input { border: 1px solid var(--border); border-radius: 6px; padding: 5px; font-weight: 700; }
-        
         .toggle-switch { position: relative; width: 44px; height: 24px; appearance: none; background: #D1D1D6; border-radius: 12px; cursor: pointer; transition: 0.3s; }
         .toggle-switch:checked { background: #34C759; }
         .toggle-switch::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: white; top: 2px; left: 2px; transition: 0.3s; }
         .toggle-switch:checked::after { left: 22px; }
-
         .debug-btn { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 10px; color: var(--text-sub); margin-top: 10px; cursor: pointer; }
 
-        /* リスト・グラフ・カレンダーのスタイルは前回同様のため省略（統合済み） */
-        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { border: 1.5px solid var(--border); border-radius: 8px; padding: 14px; font-size: 16px; width: 100%; outline: none; }
-        .add-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 800; font-size: 14px; cursor: pointer; }
-        .habit-card { border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 12px; display: flex; align-items: center; background: white; }
-        .check-box { width: 24px; height: 24px; border: 2px solid #D1D1D6; border-radius: 6px; margin-right: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
-        .check-box.done { background: var(--primary); border-color: var(--primary); color: white; }
-        .habit-info { flex: 1; cursor: pointer; }
-        .habit-name { font-weight: 700; font-size: 16px; }
-        .edit-actions { display: flex; gap: 8px; }
-        .btn-icon { background: none; border: none; font-size: 16px; cursor: pointer; color: #BBB; }
-        .progress-circle-box { position: relative; width: 220px; height: 220px; margin: 10px auto 30px; }
-        .percentage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
-        .percent-num { font-size: 48px; font-weight: 800; display: block; line-height: 1; }
-        .percent-sub { font-size: 12px; font-weight: 600; color: var(--text-sub); display: block; margin-top: 5px; }
-        .progress-item { margin-bottom: 20px; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-        .progress-bar-bg { background: #EEE; height: 6px; border-radius: 3px; overflow: hidden; }
-        .progress-bar-fill { background: var(--primary); height: 100%; transition: width 0.4s ease; }
-        .tab-bar { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
-        .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 11px; font-weight: 800; color: #BBB; cursor: pointer; }
-        .tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
-        .day-label { font-size: 10px; font-weight: 700; color: var(--text-sub); }
-        .day-cell { height: 32px; display: flex; align-items: center; justify-content: center; font-size: 13px; position: relative; }
-        .day-cell.done { color: white; font-weight: 700; z-index: 1; }
-        .day-cell.done::after { content: ''; position: absolute; width: 28px; height: 28px; background: var(--primary); border-radius: 50%; z-index: -1; }
+        /* Detail Page UI */
+        .detail-top { display: flex; align-items: center; margin-bottom: 25px; }
+        .tab-bar { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 11px; font-weight: 800; color: #BBB; cursor: pointer; letter-spacing: 0.5px; }
+        .tab.active { color: var(--primary); background: #F2F2F7; border-radius: 8px 8px 0 0; }
+
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+        .day-label { font-size: 11px; font-weight: 600; color: var(--text-sub); margin-bottom: 10px; }
+        .day-cell { height: 35px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; z-index: 1; cursor: pointer; }
+        .day-cell.done { color: white; font-weight: 700; }
+        .day-cell.done::after { content: ''; position: absolute; width: 30px; height: 30px; background: var(--primary); border-radius: 50%; z-index: -1; }
+
         .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .heat-cell { aspect-ratio: 1; border-radius: 2px; background: #E5E5E5; }
-        .heat-cell.on { background: #000; }
+        .heat-cell.on { background: #333; }
+
         [hidden] { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="nav-icon active" id="nav-habits" onclick="app.showPage('habits')"><span>⊞</span><div class="nav-label">Habits</div></div>
+    <div class="nav-icon active" id="nav-habits" onclick="app.showPage('habits')">
+        <span class="icon-habits">⊞</span>
+        <div class="nav-label">Habits</div>
+    </div>
     <div class="nav-icon" id="nav-insights" onclick="app.showPage('insights')">
-        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="18" y1="20" x2="18" y2="14" /></svg>
+        <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="6" y1="20" x2="6" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="18" y1="20" x2="18" y2="14" />
+        </svg>
         <div class="nav-label">Insights</div>
     </div>
 </div>
@@ -90,7 +122,8 @@
             <button class="debug-btn" onclick="app.testNotification()">今すぐテスト通知を送信</button>
         </div>
         <div class="input-group">
-            <input type="text" id="habitInput" placeholder="New habit name...">
+            <span style="font-size: 14px; font-weight: 800;">Input new habits</span>
+            <input type="text" id="habitInput" placeholder="Morning Meditation">
             <button class="add-btn" onclick="app.addHabit()">+ Add Habit</button>
         </div>
         <div id="habitList"></div>
@@ -100,15 +133,18 @@
         <h1>Today's Progress</h1>
         <div class="progress-circle-box">
             <canvas id="progressChart"></canvas>
-            <div class="percentage"><span class="percent-num" id="percentText">0%</span><span class="percent-sub" id="progressSubtext">0/0 Completed</span></div>
+            <div class="percentage">
+                <span class="percent-num" id="percentText">0%</span>
+                <span class="percent-sub" id="progressSubtext">0/0 Habits Completed</span>
+            </div>
         </div>
         <div id="dailyProgressList"></div>
     </div>
 
     <div id="page-detail" hidden>
-        <div style="display:flex; align-items:center; margin-bottom:20px;">
-            <span onclick="app.showPage('habits')" style="cursor:pointer; font-size:24px; padding-right:15px;">‹</span>
-            <h2 id="detailTitle" style="margin:0; font-size:18px;">Detail</h2>
+        <div class="detail-top">
+            <span onclick="app.showPage('habits')" style="cursor:pointer; font-size:28px; padding-right:20px;">‹</span>
+            <h2 id="detailTitle" style="margin:0; font-size:20px;">Detail</h2>
         </div>
         <div class="tab-bar">
             <div class="tab active" onclick="app.switchTab('cal', this)">CALENDAR</div>
@@ -116,10 +152,10 @@
             <div class="tab" onclick="app.switchTab('heat', this)">HEATMAP</div>
         </div>
         <div id="view-cal">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <span onclick="app.changeMonth(-1)" style="cursor:pointer;">‹</span>
+            <div class="cal-header">
+                <span onclick="app.changeMonth(-1)" style="cursor:pointer; padding:5px 15px;">‹</span>
                 <b id="calMonthText"></b>
-                <span onclick="app.changeMonth(1)" style="cursor:pointer;">›</span>
+                <span onclick="app.changeMonth(1)" style="cursor:pointer; padding:5px 15px;">›</span>
             </div>
             <div class="cal-grid" id="calendarGrid"></div>
         </div>
@@ -131,9 +167,10 @@
 <script>
 class HabitFlow {
     constructor() {
-        this.habits = JSON.parse(localStorage.getItem('hf_final')) || [];
+        this.habits = JSON.parse(localStorage.getItem('hf_v30')) || [];
         this.reminder = JSON.parse(localStorage.getItem('hf_reminder')) || { enabled: false, time: "23:00" };
         this.currentMonth = new Date();
+        this.selectedHabit = null;
         this.charts = { progress: null, detail: null };
         this.init();
     }
@@ -147,12 +184,12 @@ class HabitFlow {
     }
 
     save() {
-        localStorage.setItem('hf_final', JSON.stringify(this.habits));
+        localStorage.setItem('hf_v30', JSON.stringify(this.habits));
         localStorage.setItem('hf_reminder', JSON.stringify(this.reminder));
         this.renderHabitList();
     }
 
-    // 通知テスト用
+    // --- 通知機能 ---
     testNotification() {
         if (!("Notification" in window)) {
             alert("このブラウザは通知に対応していません。");
@@ -188,23 +225,18 @@ class HabitFlow {
 
     checkReminder() {
         if (!this.reminder.enabled || Notification.permission !== "granted") return;
-        
         const now = new Date();
         const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-        
         if (currentTime === this.reminder.time) {
             const today = new Date().toLocaleDateString('sv-SE');
             const uncompleted = this.habits.filter(h => !h.dates.includes(today));
             if (uncompleted.length > 0) {
-                new Notification("HabitFlow リマインダー", {
-                    body: `未完了の習慣が ${uncompleted.length} 件あります！`,
-                    icon: "/favicon.ico"
-                });
+                new Notification("HabitFlow リマインダー", { body: `未完了の習慣が ${uncompleted.length} 件あります！` });
             }
         }
     }
 
-    // --- 既存のメソッド（習慣操作、描画など） ---
+    // --- 習慣操作 ---
     addHabit() {
         const input = document.getElementById('habitInput');
         if (!input.value.trim()) return;
@@ -212,17 +244,20 @@ class HabitFlow {
         input.value = '';
         this.save();
     }
+
     editHabit(id) {
         const h = this.habits.find(x => x.id === id);
-        const name = prompt("習慣名を変更:", h.name);
-        if (name) { h.name = name; this.save(); }
+        const name = prompt("習慣名を編集:", h.name);
+        if (name && name.trim()) { h.name = name.trim(); this.save(); }
     }
+
     deleteHabit(id) {
-        if (confirm("削除しますか？")) {
+        if (confirm("削除しますか？記録も消去されます。")) {
             this.habits = this.habits.filter(h => h.id !== id);
             this.save();
         }
     }
+
     renderHabitList() {
         const list = document.getElementById('habitList');
         const today = new Date().toLocaleDateString('sv-SE');
@@ -233,15 +268,16 @@ class HabitFlow {
                 <div class="check-box ${done ? 'done' : ''}" onclick="app.toggleCheck(${h.id})">${done ? '✓' : ''}</div>
                 <div class="habit-info" onclick="app.openDetail(${h.id})">
                     <div class="habit-name">${h.name}</div>
-                    <div style="font-size:11px; color:var(--text-sub);">${this.getStreak(h)} Days Streak</div>
+                    <div style="font-size:12px; color:var(--text-sub);">${this.getStreak(h)} Days Streak</div>
                 </div>
                 <div class="edit-actions">
                     <button class="btn-icon" onclick="event.stopPropagation(); app.editHabit(${h.id})">✎</button>
-                    <button class="btn-icon" onclick="event.stopPropagation(); app.deleteHabit(${h.id})">✕</button>
+                    <button class="btn-icon btn-delete" onclick="event.stopPropagation(); app.deleteHabit(${h.id})">✕</button>
                 </div>
             </div>`;
         });
     }
+
     toggleCheck(id) {
         const h = this.habits.find(x => x.id === id);
         const today = new Date().toLocaleDateString('sv-SE');
@@ -250,11 +286,14 @@ class HabitFlow {
         else h.dates.push(today);
         this.save();
     }
+
     getStreak(h) {
         let streak = 0, d = new Date();
         while(h.dates.includes(d.toLocaleDateString('sv-SE'))) { streak++; d.setDate(d.getDate()-1); }
         return streak;
     }
+
+    // --- 描画・ページ切り替え ---
     showPage(pageId) {
         document.querySelectorAll('.main-content > div').forEach(p => p.hidden = true);
         document.getElementById(`page-${pageId}`).hidden = false;
@@ -262,6 +301,7 @@ class HabitFlow {
         document.getElementById(`nav-${pageId === 'detail' ? 'habits' : pageId}`).classList.add('active');
         if(pageId === 'insights') this.renderInsights();
     }
+
     renderInsights() {
         const today = new Date().toLocaleDateString('sv-SE');
         const completed = this.habits.filter(h => h.dates.includes(today)).length;
@@ -269,15 +309,16 @@ class HabitFlow {
         const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
         document.getElementById('percentText').innerText = `${percent}%`;
         document.getElementById('progressSubtext').innerText = `${completed}/${total} Completed`;
+
         const ctx = document.getElementById('progressChart').getContext('2d');
         if (this.charts.progress) this.charts.progress.destroy();
         this.charts.progress = new Chart(ctx, {
             type: 'doughnut',
             data: { datasets: [{ data: total === 0 ? [0, 1] : [completed, total - completed], backgroundColor: ['#000', '#F2F2F7'], borderWidth: 0 }] },
-            options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
+            options: { cutout: '85%', plugins: { tooltip: { enabled: false } }, animation: { duration: 400 } }
         });
-        const list = document.getElementById('dailyProgressList');
-        list.innerHTML = '';
+
+        const list = document.getElementById('dailyProgressList'); list.innerHTML = '';
         this.habits.forEach(h => {
             const isDone = h.dates.includes(today);
             list.innerHTML += `<div class="progress-item">
@@ -286,6 +327,7 @@ class HabitFlow {
             </div>`;
         });
     }
+
     openDetail(id) {
         this.selectedHabit = this.habits.find(h => h.id === id);
         document.getElementById('detailTitle').innerText = this.selectedHabit.name;
@@ -294,6 +336,7 @@ class HabitFlow {
         this.renderGraph();
         this.renderHeatmap();
     }
+
     renderCalendar() {
         const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
         const y = this.currentMonth.getFullYear(), m = this.currentMonth.getMonth();
@@ -306,21 +349,21 @@ class HabitFlow {
             grid.innerHTML += `<div class="day-cell ${this.selectedHabit.dates.includes(ds)?'done':''}">${d}</div>`;
         }
     }
+    
     renderGraph() {
         const ctx = document.getElementById('detailGraphChart').getContext('2d');
         if (this.charts.detail) this.charts.detail.destroy();
         const labels = [], data = [];
         for(let i=14; i>=0; i--) {
-            const d = new Date(); d.setDate(d.getDate()-i);
-            labels.push(d.getDate());
+            const d = new Date(); d.setDate(d.getDate()-i); labels.push(d.getDate());
             data.push(this.selectedHabit.dates.includes(d.toLocaleDateString('sv-SE')) ? 1 : 0);
         }
         this.charts.detail = new Chart(ctx, {
-            type: 'line',
-            data: { labels, datasets: [{ data, borderColor: '#000', tension: 0.3, pointRadius: 2 }] },
+            type: 'line', data: { labels, datasets: [{ data, borderColor: '#000', tension: 0.3, pointRadius: 2 }] },
             options: { plugins: { legend: { display: false } }, scales: { y: { display: false, max: 1.2 }, x: { grid: { display: false } } } }
         });
     }
+    
     renderHeatmap() {
         const hm = document.getElementById('heatmapGrid'); hm.innerHTML = '';
         for(let i=70; i>=0; i--) {
@@ -331,8 +374,7 @@ class HabitFlow {
     }
     changeMonth(diff) { this.currentMonth.setMonth(this.currentMonth.getMonth()+diff); this.renderCalendar(); }
     switchTab(type, el) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); el.classList.add('active');
         ['cal', 'graph', 'heat'].forEach(v => document.getElementById(`view-${v}`).hidden = true);
         document.getElementById(`view-${type}`).hidden = false;
     }
